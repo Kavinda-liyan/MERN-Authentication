@@ -6,7 +6,12 @@
   "type": "module",
   "scripts": {
     "start": "node backend/server.js",
+<<<<<<< HEAD
     "server": "nodemon backend/server.js"
+=======
+    "server": "nodemon backend/server.js",
+    "client": "npm run dev --prefix frontend"
+>>>>>>> origin/master
   },
   "keywords": [],
   "author": "",
