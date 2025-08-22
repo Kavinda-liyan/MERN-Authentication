@@ -1,7 +1,6 @@
 import {
   faBars,
   faClose,
-  faCross,
   faSignIn,
   faSignInAlt,
 } from "@fortawesome/free-solid-svg-icons";
@@ -10,11 +9,9 @@ import { useState } from "react";
 
 const Header = () => {
   const [toggleNavigation, setToggleNavigation] = useState(false);
-  const [hidBars, setHideBars] = useState(false);
 
   const handleToggleClick = () => {
     setToggleNavigation((prev) => !prev);
-    setHideBars((prev) => !prev);
   };
   const navLinks = (
     <>
@@ -33,7 +30,8 @@ const Header = () => {
     <>
       <nav>
         <div className="w-full h-[50px] bg-cyan-950">
-          <div className="w-full h-full pl-10 pr-10 flex items-center justify-between relative">
+            
+          <div className="max-2xl:pl-[60px] max-2xl:pr-[60px] max-md:pl-[10px] max-md:pr-[10px] w-full h-full flex items-center justify-between relative">
             <div className="headerLogo text-white">
               <h3 className="text-bold font-semibold text-xl">
                 <span className="text-sky-400">MERN</span> Authentication
@@ -41,32 +39,36 @@ const Header = () => {
             </div>
             <div className="Auth flex gap-5 max-md:hidden">{navLinks}</div>
             <div className="max-2xl:hidden max-md:flex items-center">
-              <button
-                className={`${
-                  hidBars ? "hidden" : "flex"
-                } font-semibold text-[18px] text-white hover:text-neutral-300
-              hover:cursor-pointer duration-150`}
-                onClick={handleToggleClick}
-              >
-                <FontAwesomeIcon icon={faBars} />
-              </button>
+              {!toggleNavigation && (
+                <button
+                aria-label="Open menu"
+                  className="z-[51] font-semibold text-[18px] text-white hover:text-neutral-300 duration-150"
+                  onClick={handleToggleClick}
+                >
+                  <FontAwesomeIcon icon={faBars} />
+                </button>
+              )}
+              {toggleNavigation && (
+                <button
+                aria-label="Close menu"
+                  className="z-[51]  font-semibold text-[18px] text-white hover:text-neutral-300 duration-150"
+                  onClick={handleToggleClick}
+                >
+                  <FontAwesomeIcon icon={faClose} />
+                </button>
+              )}
             </div>
             <div
               className={`${
-                toggleNavigation ? "flex opacity-100 duration-200" : "hidden opacity-0"
-              } top-[50px] absolute w-full gap-10 flex-col bg-cyan-950 h-48 z-[100] left-0 items-center justify-center`}
+                toggleNavigation
+                  ? "scale-y-100 opacity-100"
+                  : "scale-y-0 opacity-0 pointer-events-none"
+              } top-[0px] absolute w-full gap-10 flex flex-col bg-cyan-950 h-[100vh] z-[50] left-0 items-center justify-center transform transition-all duration-300 origin-top `}
             >
-              <div
-                className="absolute right-10 top-10 text-white font-semibold 
-                hover:text-neutral-300 hover:cursor-pointer duration-150"
-              >
-                <button onClick={handleToggleClick}>
-                  <FontAwesomeIcon icon={faClose} />
-                </button>
-              </div>
               {navLinks}
             </div>
           </div>
+          
         </div>
       </nav>
     </>
