@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
-    <div className="w-full h-full mt-[60px] flex items-center justify-center">
+    <div className="w-full h-full  flex items-center justify-center">
       <div className="w-[80%] h-auto shadow-md border-[1.5px] rounded-md border-neutral-300/70 bg-neutral-100">
         <h1 className="text-center my-[20px] font-semibold text-2xl">
           MERN Authentication

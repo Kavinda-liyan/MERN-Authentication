@@ -6,7 +6,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { Link, Links } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [toggleNavigation, setToggleNavigation] = useState(false);
