@@ -3,18 +3,53 @@ import {
   faClose,
   faSignIn,
   faSignInAlt,
+  faSignOutAlt,
+  faUserAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { useLogoutMutation } from "../slices/usersApiSlice.js";
+import { logout } from "../slices/authSlice.js";
 
 const Header = () => {
   const [toggleNavigation, setToggleNavigation] = useState(false);
+  const [logoutApiCall] = useLogoutMutation();
+  const { userInfo } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleToggleClick = () => {
     setToggleNavigation((prev) => !prev);
   };
-  const navLinks = (
+
+  const handleLogout = async () => {
+    try {
+      await logoutApiCall().unwrap();
+      dispatch(logout());
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const navLinks = userInfo ? (
+    <>
+      <Link to={"/profile"}>
+        <h3 className="text-white text-[14px] font-semibold hover:text-neutral-300 hover:cursor-pointer duration-150">
+          <FontAwesomeIcon icon={faUserAlt} className="pr-1" />
+          {userInfo.name}
+        </h3>
+      </Link>
+      <button onClick={handleLogout}>
+        <h3 className="text-white text-[14px] font-semibold hover:text-neutral-300 hover:cursor-pointer duration-150">
+          <FontAwesomeIcon icon={faSignOutAlt} className="pr-1" />
+          Sign out
+        </h3>
+      </button>
+    </>
+  ) : (
     <>
       <Link to={"/login"}>
         <h3 className="text-white text-[14px] font-semibold hover:text-neutral-300 hover:cursor-pointer duration-150">

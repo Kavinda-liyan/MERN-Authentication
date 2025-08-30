@@ -1,13 +1,30 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import FormContainer from "../components/FormContainer";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useLoginMutation } from "../slices/usersApiSlice.js";
+import { setCredentials } from "../slices/authSlice.js";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [visiblePw, setVisiblePw] = useState(false);
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [login, { isLoading }] = useLoginMutation();
+
+  const { userInfo } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate("/");
+    }
+  }, [navigate, userInfo]);
 
   const handleChangeEmail = (e) => {
     setEmail(e.target.value);
@@ -16,9 +33,17 @@ const Login = () => {
     setPassword(e.target.value);
   };
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    console.log(email, " ", password);
+
+    try {
+      const res = await login({ email, password }).unwrap();
+      dispatch(setCredentials({ ...res }));
+      navigate("/");
+      toast.success("Login Success");
+    } catch (error) {
+      toast.error(error.data.message || error.error);
+    }
   };
 
   return (
