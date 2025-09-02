@@ -1,30 +1,32 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import FormContainer from "../components/FormContainer";
+import FormContainer from "../../components/FormContainer";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { useLoginMutation } from "../slices/usersApiSlice.js";
-import { setCredentials } from "../slices/authSlice.js";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { useLoginMutation } from "../../app/api/usersApiSlice";
+import { setCredentials } from "../../app/features/auth/authSlice";
 import { toast } from "react-toastify";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [visiblePw, setVisiblePw] = useState(false);
-
-  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [login, { isLoading }] = useLoginMutation();
-
   const { userInfo } = useSelector((state) => state.auth);
+
+  const { search } = useLocation();
+  const sp = new URLSearchParams(search);
+  const redirect = sp.get("redirect") || "/";
 
   useEffect(() => {
     if (userInfo) {
-      navigate("/");
+      navigate(redirect);
     }
-  }, [navigate, userInfo]);
+  }, [navigate, redirect, userInfo]);
 
   const handleChangeEmail = (e) => {
     setEmail(e.target.value);
@@ -38,11 +40,11 @@ const Login = () => {
 
     try {
       const res = await login({ email, password }).unwrap();
+
       dispatch(setCredentials({ ...res }));
-      navigate("/");
-      toast.success("Login Success");
+      navigate(redirect);
     } catch (error) {
-      toast.error(error.data.message || error.error);
+      toast.error(error?.data?.message || error.message);
     }
   };
 
@@ -80,6 +82,7 @@ const Login = () => {
           </button>
         </div>
         <button
+          disabled={isLoading}
           className="bg-blue-600 w-full my-1 py-1 text-white font-semibold rounded-md shadow-md 
         hover:cursor-pointer hover:bg-blue-500"
         >

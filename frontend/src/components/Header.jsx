@@ -1,5 +1,6 @@
 import {
   faBars,
+  faCaretDown,
   faClose,
   faSignIn,
   faSignInAlt,
@@ -10,59 +11,94 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { useLogoutMutation } from "../slices/usersApiSlice.js";
-import { logout } from "../slices/authSlice.js";
+import { useLogoutMutation } from "../app/api/usersApiSlice";
+import { logout } from "../app/features/auth/authSlice";
 
 const Header = () => {
   const [toggleNavigation, setToggleNavigation] = useState(false);
-  const [logoutApiCall] = useLogoutMutation();
+  const [toggleDropdown, setToggleDropdown] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const [logoutApiCall] = useLogoutMutation();
+
   const handleToggleClick = () => {
     setToggleNavigation((prev) => !prev);
+  };
+  const handleDorpdown = () => {
+    setToggleDropdown((prev) => !prev);
   };
 
   const handleLogout = async () => {
     try {
       await logoutApiCall().unwrap();
       dispatch(logout());
-      navigate("/");
+      navigate("/login");
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
   const navLinks = userInfo ? (
     <>
-      <Link to={"/profile"}>
-        <h3 className="text-white text-[14px] font-semibold hover:text-neutral-300 hover:cursor-pointer duration-150">
-          <FontAwesomeIcon icon={faUserAlt} className="pr-1" />
-          {userInfo.name}
-        </h3>
-      </Link>
-      <button onClick={handleLogout}>
-        <h3 className="text-white text-[14px] font-semibold hover:text-neutral-300 hover:cursor-pointer duration-150">
-          <FontAwesomeIcon icon={faSignOutAlt} className="pr-1" />
-          Sign out
-        </h3>
+      <button
+        onClick={handleDorpdown}
+        className="text-sm font-semibold text-white hover:cursor-pointer hover:text-neutral-300"
+      >
+        {userInfo.name}
+        <FontAwesomeIcon icon={faCaretDown} className="pl-1" />
       </button>
+      {toggleDropdown && (
+        <ul className="absolute top-10 right-10 bg-cyan-900 p-2 rounded-md ">
+          <li className="my-2 p-1">
+            <Link to={"/profile"} >
+              <h3 className="text-white text-[14px] font-semibold hover:text-neutral-300 hover:cursor-pointer duration-150">
+                <FontAwesomeIcon icon={faUserAlt} className="pr-1" />
+                Profile
+              </h3>
+            </Link>
+          </li>
+          <li className="my-2 p-1">
+            <button onClick={handleLogout}>
+              <h3 className="text-white text-[14px] font-semibold hover:text-neutral-300 hover:cursor-pointer duration-150">
+                <FontAwesomeIcon icon={faSignOutAlt} className="pr-1" />
+                Sign out
+              </h3>
+            </button>
+          </li>
+        </ul>
+      )}
     </>
   ) : (
     <>
-      <Link to={"/login"}>
-        <h3 className="text-white text-[14px] font-semibold hover:text-neutral-300 hover:cursor-pointer duration-150">
-          <FontAwesomeIcon icon={faSignInAlt} className="pr-1" />
-          Sign in
-        </h3>
-      </Link>
-      <Link to={"/register"}>
-        <h3 className="text-white text-[14px] font-semibold hover:text-neutral-300 hover:cursor-pointer duration-150">
-          <FontAwesomeIcon icon={faSignIn} className="pr-1" />
-          Sign up
-        </h3>
-      </Link>
+      <button
+        onClick={handleDorpdown}
+        className="text-sm font-semibold text-white hover:cursor-pointer hover:text-neutral-300"
+      >
+        Sign in
+        <FontAwesomeIcon icon={faCaretDown} className="pl-1" />
+      </button>
+      {toggleDropdown && (
+        <ul className="absolute top-10 right-10 bg-cyan-900 p-2 rounded-md ">
+          <li className="my-2 p-1">
+            <Link to={"/login"}>
+              <h3 className="text-white text-[14px] font-semibold hover:text-neutral-300 hover:cursor-pointer duration-150">
+                <FontAwesomeIcon icon={faSignInAlt} className="pr-1" />
+                Sign in
+              </h3>
+            </Link>
+          </li>
+          <li className="my-2 p-1">
+            <Link to={"/register"}>
+              <h3 className="text-white text-[14px] font-semibold hover:text-neutral-300 hover:cursor-pointer duration-150">
+                <FontAwesomeIcon icon={faSignIn} className="pr-1" />
+                Sign up
+              </h3>
+            </Link>
+          </li>
+        </ul>
+      )}
     </>
   );
 

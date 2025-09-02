@@ -6,13 +6,13 @@ import {
   Route,
   RouterProvider,
 } from "react-router-dom";
-import store from "./store.js";
+import store from "./app/store.js";
 import { Provider } from "react-redux";
 import "./index.css";
 import App from "./App.jsx";
 import Home from "./pages/Home.jsx";
-import Login from "./pages/Login.jsx";
-import Register from "./pages/Register.jsx";
+import Login from "./pages/Auth/Login.jsx";
+import Register from "./pages/Auth/Register.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(

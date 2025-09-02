@@ -1,8 +1,12 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import FormContainer from "../components/FormContainer";
+import FormContainer from "../../components/FormContainer";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useRegisterMutation } from "../../app/api/usersApiSlice";
+import { setCredentials } from "../../app/features/auth/authSlice";
+import { toast } from "react-toastify";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -11,6 +15,22 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [visiblePw, setVisiblePw] = useState(false);
   const [visibleCPw, setVisibleCPw] = useState(false);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [register, { isLoading }] = useRegisterMutation();
+  const { userInfo } = useSelector((state) => state.auth);
+
+  const { search } = useLocation();
+  const sp = new URLSearchParams(search);
+  const redirect = sp.get("redirect") || "/";
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate(redirect);
+    }
+  }, [navigate, redirect, userInfo]);
 
   const handleChangeName = (e) => {
     setName(e.target.value);
@@ -25,9 +45,21 @@ const Register = () => {
     setConfirmPassword(e.target.value);
   };
 
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    console.log(email, " ", password);
+    if (password !== confirmPassword) {
+      toast.error("Password do not match");
+    } else {
+      try {
+        const res = await register({ name, email, password }).unwrap();
+
+        dispatch(setCredentials({ ...res }));
+        navigate(redirect);
+        toast.success("User Successfully registered");
+      } catch (error) {
+        toast.error(error?.data?.message || error.message);
+      }
+    }
   };
 
   return (
@@ -96,6 +128,8 @@ const Register = () => {
           </div>
         </div>
         <button
+          disabled={isLoading}
+          type="submit"
           className="bg-blue-600 w-full my-1 py-1 text-white font-semibold rounded-md shadow-md 
         hover:cursor-pointer hover:bg-blue-500"
         >
