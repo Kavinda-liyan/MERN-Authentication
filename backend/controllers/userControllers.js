@@ -1,35 +1,49 @@
 import expressAsyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
 import generateToken from "../utils/generateToken.js";
+import bcrypt from "bcryptjs";
 
 //Register User
 //route  POST /api/users
 // public
-const registerUser = expressAsyncHandler(async (req, res) => {
+const createUser = expressAsyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
+  //checking all the inputs
+  if (!name || !email || !password) {
+    throw new Error("Please fill all the input fields");
+  }
   //checking if user exists
   const userExists = await User.findOne({ email });
   if (userExists) {
-    res.status(400);
+    res.status(400).send("User already exists");
     throw new Error("User already exists");
   }
 
-  //creating user
-  const user = await User.create({
-    name,
-    email,
-    password,
-  });
+  //hashing password
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
 
-  if (user) {
-    generateToken(res, user._id);
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
+  //creating user
+  try {
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
     });
-  } else {
+
+    if (user) {
+      generateToken(res, user._id);
+      res.status(201).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      });
+    } else {
+      res.status(400);
+      throw new Error("Invalid user data");
+    }
+  } catch (error) {
     res.status(400);
     throw new Error("Invalid user data");
   }
@@ -40,18 +54,23 @@ const registerUser = expressAsyncHandler(async (req, res) => {
 // public
 const authUser = expressAsyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email });
+  const existingUser = await User.findOne({ email });
 
-  if (user && (await user.matchPassword(password))) {
-    generateToken(res, user._id);
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-    });
-  } else {
-    res.status(400);
-    throw new Error("Invalid email or password");
+  if (existingUser) {
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      existingUser.password
+    );
+
+    if (isPasswordValid) {
+      generateToken(res, existingUser._id);
+      res.status(201).json({
+        _id: existingUser._id,
+        name: existingUser.name,
+        email: existingUser.email,
+      });
+      return;
+    }
   }
 });
 
@@ -67,16 +86,29 @@ const logoutUser = expressAsyncHandler(async (req, res) => {
   res.status(200).json({ message: "User logged out" });
 });
 
+//get all users profile
+//route get api/users
+//private
+const getAllUsers = expressAsyncHandler(async (req, res) => {
+  const users = await User.find({});
+  res.status(200).json(users);
+});
+
 //get user profile
 //route  GET /api/users/profile
 //private
 const getUserProfile = expressAsyncHandler(async (req, res) => {
-  const user = {
-    _id: req.user._id,
-    name: req.user.name,
-    email: req.user.email,
-  };
-  res.status(200).json(user);
+  const user = await User.findById(req.user._id);
+  if (user) {
+    res.json({
+      _id: user.id,
+      name: user.name,
+      email: user.email,
+    });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
 });
 
 //update user profile
@@ -107,8 +139,9 @@ const updateUserProfile = expressAsyncHandler(async (req, res) => {
 
 export {
   authUser,
-  registerUser,
+  createUser,
   logoutUser,
+  getAllUsers,
   getUserProfile,
   updateUserProfile,
 };
