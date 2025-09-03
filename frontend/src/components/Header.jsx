@@ -1,18 +1,22 @@
 import {
   faBars,
   faCaretDown,
+  faCaretUp,
   faClose,
   faSignIn,
   faSignInAlt,
   faSignOutAlt,
   faUserAlt,
+  faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useLogoutMutation } from "../app/api/usersApiSlice";
 import { logout } from "../app/features/auth/authSlice";
+import List from "./Components/List";
+import { PAGE_PADDINGS } from "../app/constants";
 
 const Header = () => {
   const [toggleNavigation, setToggleNavigation] = useState(false);
@@ -20,13 +24,14 @@ const Header = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dropDownRef = useRef(null);
 
   const [logoutApiCall] = useLogoutMutation();
 
   const handleToggleClick = () => {
     setToggleNavigation((prev) => !prev);
   };
-  const handleDorpdown = () => {
+  const handleDropdown = () => {
     setToggleDropdown((prev) => !prev);
   };
 
@@ -40,63 +45,105 @@ const Header = () => {
     }
   };
 
+  const authProfile = (
+    <>
+      <List>
+        <Link to={"/profile"}>
+          <FontAwesomeIcon icon={faUserAlt} className="pr-1" />
+          Profile
+        </Link>
+      </List>
+
+      <List>
+        <button onClick={handleLogout} className="hover:cursor-pointer">
+          <FontAwesomeIcon icon={faSignOutAlt} className="pr-1" />
+          Sign out
+        </button>
+      </List>
+    </>
+  );
+
+  const authLinks = (
+    <>
+      <List>
+        <Link to={"/login"}>
+          <FontAwesomeIcon icon={faSignInAlt} className="pr-1" />
+          Sign in
+        </Link>
+      </List>
+      <List>
+        <Link to={"/register"}>
+          <FontAwesomeIcon icon={faSignIn} className="pr-1" />
+          Sign up
+        </Link>
+      </List>
+
+    </>
+  );
+
   const navLinks = userInfo ? (
     <>
       <button
-        onClick={handleDorpdown}
+        onClick={handleDropdown}
+        aria-haspopup="true"
+        aria-expanded={toggleDropdown}
         className="text-sm font-semibold text-white hover:cursor-pointer hover:text-neutral-300"
       >
         {userInfo.name}
-        <FontAwesomeIcon icon={faCaretDown} className="pl-1" />
+        {toggleDropdown ? (
+          <FontAwesomeIcon icon={faCaretUp} className="pl-1" />
+        ) : (
+          <FontAwesomeIcon icon={faCaretDown} className="pl-1" />
+        )}
       </button>
       {toggleDropdown && (
-        <ul className="absolute top-10 right-10 bg-cyan-900 p-2 rounded-md ">
-          <li className="my-2 p-1">
-            <Link to={"/profile"} >
-              <h3 className="text-white text-[14px] font-semibold hover:text-neutral-300 hover:cursor-pointer duration-150">
-                <FontAwesomeIcon icon={faUserAlt} className="pr-1" />
-                Profile
-              </h3>
-            </Link>
-          </li>
-          <li className="my-2 p-1">
-            <button onClick={handleLogout}>
-              <h3 className="text-white text-[14px] font-semibold hover:text-neutral-300 hover:cursor-pointer duration-150">
-                <FontAwesomeIcon icon={faSignOutAlt} className="pr-1" />
-                Sign out
-              </h3>
-            </button>
-          </li>
+        <ul
+          className="absolute top-10 right-10 bg-cyan-900  rounded-md shadow-md"
+          ref={dropDownRef}
+        >
+          {userInfo.isAdmin ? (
+            <>
+              <List>
+                <Link to={"/profile"}>
+                  <FontAwesomeIcon icon={faUserAlt} className="pr-1" />
+                  Profile
+                </Link>
+              </List>
+
+              <List>
+                <FontAwesomeIcon icon={faUsers} className="pr-1" />
+                <Link to={"/users"}>All Users</Link>
+              </List>
+
+              <List>
+                <button onClick={handleLogout} className="hover:cursor-pointer">
+                  <FontAwesomeIcon icon={faSignOutAlt} className="pr-1" />
+                  Sign out
+                </button>
+              </List>
+            </>
+          ) : (
+            <>{authProfile}</>
+          )}
         </ul>
       )}
     </>
   ) : (
     <>
       <button
-        onClick={handleDorpdown}
+        onClick={handleDropdown}
         className="text-sm font-semibold text-white hover:cursor-pointer hover:text-neutral-300"
       >
         Sign in
-        <FontAwesomeIcon icon={faCaretDown} className="pl-1" />
+        {toggleDropdown ? (
+          <FontAwesomeIcon icon={faCaretUp} className="pl-1" />
+        ) : (
+          <FontAwesomeIcon icon={faCaretDown} className="pl-1" />
+        )}
       </button>
       {toggleDropdown && (
         <ul className="absolute top-10 right-10 bg-cyan-900 p-2 rounded-md ">
-          <li className="my-2 p-1">
-            <Link to={"/login"}>
-              <h3 className="text-white text-[14px] font-semibold hover:text-neutral-300 hover:cursor-pointer duration-150">
-                <FontAwesomeIcon icon={faSignInAlt} className="pr-1" />
-                Sign in
-              </h3>
-            </Link>
-          </li>
-          <li className="my-2 p-1">
-            <Link to={"/register"}>
-              <h3 className="text-white text-[14px] font-semibold hover:text-neutral-300 hover:cursor-pointer duration-150">
-                <FontAwesomeIcon icon={faSignIn} className="pr-1" />
-                Sign up
-              </h3>
-            </Link>
-          </li>
+          {authLinks}
         </ul>
       )}
     </>
@@ -106,7 +153,9 @@ const Header = () => {
     <>
       <nav>
         <div className="w-full h-[50px] bg-cyan-950">
-          <div className="max-2xl:pl-[60px] max-2xl:pr-[60px] max-md:pl-[10px] max-md:pr-[10px] w-full h-full flex items-center justify-between relative">
+          <div
+            className={`w-full h-full flex items-center justify-between relative ${PAGE_PADDINGS}`}
+          >
             <Link to={"/"}>
               <div className="headerLogo text-white">
                 <h3 className="text-bold font-semibold text-xl">
@@ -115,7 +164,7 @@ const Header = () => {
               </div>
             </Link>
             <div className="Auth flex gap-5 max-md:hidden">{navLinks}</div>
-            <div className="max-2xl:hidden max-md:flex items-center">
+            <div className=" max-[2160px]:hidden max-md:flex items-center">
               {!toggleNavigation && (
                 <button
                   aria-label="Open menu"

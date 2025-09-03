@@ -69,6 +69,7 @@ const authUser = expressAsyncHandler(async (req, res) => {
         _id: existingUser._id,
         name: existingUser.name,
         email: existingUser.email,
+        isAdmin: existingUser.isAdmin,
       });
       return;
     }
