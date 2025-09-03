@@ -38,6 +38,7 @@ const createUser = expressAsyncHandler(async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        isAdmin: user.isAdmin,
       });
     } else {
       res.status(400);
@@ -88,7 +89,7 @@ const logoutUser = expressAsyncHandler(async (req, res) => {
 
 //get all users profile
 //route get api/users
-//private
+//private //authorized
 const getAllUsers = expressAsyncHandler(async (req, res) => {
   const users = await User.find({});
   res.status(200).json(users);
@@ -104,6 +105,7 @@ const getUserProfile = expressAsyncHandler(async (req, res) => {
       _id: user.id,
       name: user.name,
       email: user.email,
+      isAdmin: user.isAdmin,
     });
   } else {
     res.status(404);
@@ -133,7 +135,25 @@ const updateUserProfile = expressAsyncHandler(async (req, res) => {
     });
   } else {
     res.status(404);
-    throw new Error("User not found");
+    throw new Error("User not found.");
+  }
+});
+
+//delete user profile
+//route  DELETE /api/
+//private //authorized
+const deleteUserById = expressAsyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (user) {
+    if (user.isAdmin) {
+      res.status(400);
+      throw new Error("Cannot delete admin.");
+    }
+    await User.deleteOne({ _id: user._id });
+    res.json({ message: "User deleted." });
+  } else {
+    res.status(404);
+    throw new Error("User not found.");
   }
 });
 
@@ -144,4 +164,5 @@ export {
   getAllUsers,
   getUserProfile,
   updateUserProfile,
+  deleteUserById,
 };
