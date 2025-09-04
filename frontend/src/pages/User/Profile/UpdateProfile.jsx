@@ -36,7 +36,7 @@ const UpdateProfile = () => {
           password,
         }).unwrap();
 
-        dispatch(setCredentials({ ...res }));
+        dispatch(setCredentials({ ...userInfo, ...res }));
         navigate("/profile");
         toast.success("profile updated successfully");
       } catch (error) {

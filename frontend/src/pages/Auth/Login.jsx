@@ -28,15 +28,11 @@ const Login = () => {
     }
   }, [navigate, redirect, userInfo]);
 
-  const handleChangeEmail = (e) => {
-    setEmail(e.target.value);
-  };
-  const handleChangePassword = (e) => {
-    setPassword(e.target.value);
-  };
-
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    if (!email || !password) {
+      toast.error("Email or password field is empty");
+    }
 
     try {
       const res = await login({ email, password }).unwrap();
@@ -59,7 +55,7 @@ const Login = () => {
             placeholder="Enter your email here..."
             value={email}
             autoComplete="username"
-            onChange={handleChangeEmail}
+            onChange={(e) => setEmail(e.target.value)}
             className="bg-neutral-100 border-[1.5px] border-neutral-200 rounded-md p-1"
           />
         </div>
@@ -70,18 +66,18 @@ const Login = () => {
             placeholder="Enter your password here..."
             value={password}
             autoComplete="current-password"
-            onChange={handleChangePassword}
+            onChange={(e) => setPassword(e.target.value)}
             className="bg-neutral-100 border-[1.5px] border-neutral-200 rounded-md p-1"
           />
           <button
-            onMouseDown={() => setVisiblePw(true)}
-            onMouseUp={() => setVisiblePw(false)}
+            onClick={() => setVisiblePw((prev) => !prev)}
             className="absolute bottom-1 right-2 text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
           >
             <FontAwesomeIcon icon={faEye} />
           </button>
         </div>
         <button
+          type="submit"
           disabled={isLoading}
           className="bg-blue-600 w-full my-1 py-1 text-white font-semibold rounded-md shadow-md 
         hover:cursor-pointer hover:bg-blue-500"

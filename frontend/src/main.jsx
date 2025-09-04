@@ -14,8 +14,10 @@ import Home from "./pages/Home.jsx";
 import Login from "./pages/Auth/Login.jsx";
 import Register from "./pages/Auth/Register.jsx";
 import Profile from "./pages/User/Profile/Profile.jsx";
-import PrivateRoute from "./components/PrivateRoute.jsx";
+import PrivateRoute from "./components/Routes/PrivateRoute.jsx";
 import UpdateProfile from "./pages/User/Profile/UpdateProfile.jsx";
+import AdminRoute from "./components/Routes/AdminRoute.jsx";
+import ViewUsers from "./pages/Admin/ViewUsers.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -37,6 +39,14 @@ const router = createBrowserRouter(
           <PrivateRoute>
             <UpdateProfile />
           </PrivateRoute>
+        }
+      />
+      <Route
+        path="/users"
+        element={
+          <AdminRoute>
+            <ViewUsers />
+          </AdminRoute>
         }
       />
     </Route>

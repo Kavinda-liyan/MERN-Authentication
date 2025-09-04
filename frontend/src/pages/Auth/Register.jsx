@@ -32,21 +32,12 @@ const Register = () => {
     }
   }, [navigate, redirect, userInfo]);
 
-  const handleChangeName = (e) => {
-    setName(e.target.value);
-  };
-  const handleChangeEmail = (e) => {
-    setEmail(e.target.value);
-  };
-  const handleChangePassword = (e) => {
-    setPassword(e.target.value);
-  };
-  const handleChangeConfirmPassword = (e) => {
-    setConfirmPassword(e.target.value);
-  };
-
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
+    if (!name || !email || !password || !confirmPassword) {
+      toast.error("Please complete all the input fields");
+    }
+
     if (password !== confirmPassword) {
       toast.error("Password do not match");
     } else {
@@ -73,7 +64,7 @@ const Register = () => {
             placeholder="Enter your name here..."
             value={name}
             autoComplete="username"
-            onChange={handleChangeName}
+            onChange={(e) => setName(e.target.value)}
             className="bg-neutral-100 border-[1.5px] border-neutral-200 rounded-md p-1"
           />
         </div>
@@ -85,7 +76,7 @@ const Register = () => {
             placeholder="Enter your email here..."
             value={email}
             autoComplete="username"
-            onChange={handleChangeEmail}
+            onChange={(e) => setEmail(e.target.value.toLowerCase())}
             className="bg-neutral-100 border-[1.5px] border-neutral-200 rounded-md p-1"
           />
         </div>
@@ -97,12 +88,11 @@ const Register = () => {
               placeholder="Enter your password here..."
               value={password}
               autoComplete="current-password"
-              onChange={handleChangePassword}
+              onChange={(e) => setPassword(e.target.value)}
               className="bg-neutral-100 border-[1.5px] border-neutral-200 rounded-md p-1"
             />
             <button
-              onMouseDown={() => setVisiblePw(true)}
-              onMouseUp={() => setVisiblePw(false)}
+              onClick={() => setVisiblePw((prev) => !prev)}
               className="absolute bottom-1 right-2 text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
             >
               <FontAwesomeIcon icon={faEye} />
@@ -115,12 +105,11 @@ const Register = () => {
               placeholder="Confirm password..."
               value={confirmPassword}
               autoComplete="current-password"
-              onChange={handleChangeConfirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               className="bg-neutral-100 border-[1.5px] border-neutral-200 rounded-md p-1"
             />
             <button
-              onMouseDown={() => setVisiblePw(true)}
-              onMouseUp={() => setVisiblePw(false)}
+              onClick={() => setVisibleCPw((prev) => !prev)}
               className="absolute bottom-1 right-2 text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
             >
               <FontAwesomeIcon icon={faEye} />

@@ -3,11 +3,21 @@ import { useViewProfileQuery } from "../../../app/api/usersApiSlice.js";
 import { PAGE_PADDINGS, PAGE_HEIGHT } from "../../../app/constants.js";
 import ProfileAvatar from "../../../Assets/Avatar.png";
 import { faKey } from "@fortawesome/free-solid-svg-icons";
-import TableRow from "../../../components/Components/TableRow.jsx";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
 const Profile = () => {
-  const { data, isLoading, error } = useViewProfileQuery();
+  const { userInfo } = useSelector((state) => state.auth);
+  const { data, isLoading, error, refetch } = useViewProfileQuery(undefined, {
+    skip: !userInfo,
+  });
+
+  useEffect(() => {
+    if (userInfo) {
+      refetch();
+    }
+  }, [userInfo, refetch]);
   if (isLoading) {
     return <p>Loading...</p>;
   }
@@ -31,12 +41,15 @@ const Profile = () => {
             )}
           </div>
           <div className="text-cyan-900 text-[18px] text-left">
-            <TableRow title={"Name : "} data={data.name} />
-            <TableRow title={"Email : "} data={data.email} />
-            <TableRow
-              title={"Role : "}
-              data={`${data.isAdmin ? "Admin" : "User"}`}
-            />
+            <p className="text-cyan-900">
+              <span>Name :</span> <span>{data.name}</span>
+            </p>
+            <p className="text-cyan-900">
+              <span>Email :</span> <span>{data.email}</span>
+            </p>
+            <p className="text-cyan-900">
+              <span>Role :</span> <span>{data.isAdmin ? "Admin" : "User"}</span>
+            </p>
           </div>
           <div className="text-right w-full float-end my-2">
             <Link
