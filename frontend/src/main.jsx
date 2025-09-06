@@ -18,6 +18,7 @@ import PrivateRoute from "./components/Routes/PrivateRoute.jsx";
 import UpdateProfile from "./pages/User/Profile/UpdateProfile.jsx";
 import AdminRoute from "./components/Routes/AdminRoute.jsx";
 import ViewUsers from "./pages/Admin/ViewUsers.jsx";
+import Error from "./components/Error.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -49,6 +50,7 @@ const router = createBrowserRouter(
           </AdminRoute>
         }
       />
+      <Route path="/error" element={<Error />} />
     </Route>
   )
 );
