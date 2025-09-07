@@ -6,6 +6,8 @@ import { faKey } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
+import Loading from "../../../components/Loading.jsx";
+import Error from "../../../components/Error.jsx";
 
 const Profile = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -19,10 +21,10 @@ const Profile = () => {
     }
   }, [userInfo, refetch]);
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <Loading />;
   }
   if (error) {
-    return <p>Error loading page</p>;
+    return <Error />;
   }
 
   return (

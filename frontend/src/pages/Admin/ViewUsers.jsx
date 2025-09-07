@@ -12,32 +12,54 @@ import {
   useDeleteUserMutation,
 } from "../../app/api/usersApiSlice";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import Error from "../../components/Error";
+import Loading from "../../components/Loading";
+import Confirm from "../../components/Popup Models/Confirm";
 const ViewUsers = () => {
   const { data: users, isLoading, refetch, error } = useGetUsersQuery();
   const [deleteUser] = useDeleteUserMutation();
   const { userInfo } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+  const [showModel, setShowModel] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     refetch();
   }, [refetch]);
 
-  const deleteHandler = async (id, name) => {
-    if (window.confirm(`Are you sure you want to delete ${name}?`)) {
+  const deleteHandler = async () => {
+    if (selectedUser) {
       try {
-        await deleteUser(id);
+        await deleteUser(selectedUser._id);
         navigate("/users");
-        toast.success(`You have successfully deleted ${name}.`);
+        toast.success(`You have successfully deleted ${selectedUser.name}.`);
       } catch (error) {
         toast.error(error.data.message || error.error);
       }
-    }
+    } else return;
   };
+
+  if (error) {
+    return <Error />;
+  }
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
-    <div className={`${PAGE_HEIGHT}`}>
+    <div className={`${PAGE_HEIGHT} relative`}>
+      {showModel && (
+        <Confirm
+          message={"Are you sure you want to delete this user?"}
+          varient={"warning"}
+          fn={deleteHandler}
+        />
+      )}
+
       <div
         className={`${PAGE_PADDINGS} flex items-center justify-center h-full w-full`}
       >
@@ -91,7 +113,10 @@ const ViewUsers = () => {
                     {!user.isAdmin && (
                       <button
                         disabled={userInfo._id == user._id}
-                        onClick={() => deleteHandler(user._id, user.name)}
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setShowModel(true);
+                        }}
                         className={
                           userInfo._id == user._id
                             ? "text-gray-400 text-xs p-2 flex items-center"

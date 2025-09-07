@@ -7,6 +7,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { useLoginMutation } from "../../app/api/usersApiSlice";
 import { setCredentials } from "../../app/features/auth/authSlice";
 import { toast } from "react-toastify";
+import Loading from "../../components/Loading";
+import Error from "../../components/Error";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +17,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [login, { isLoading }] = useLoginMutation();
+  const [login, { isLoading, error }] = useLoginMutation();
   const { userInfo } = useSelector((state) => state.auth);
 
   const { search } = useLocation();
@@ -43,6 +45,14 @@ const Login = () => {
       toast.error(error?.data?.message || error.message);
     }
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <Error />;
+  }
 
   return (
     <FormContainer>

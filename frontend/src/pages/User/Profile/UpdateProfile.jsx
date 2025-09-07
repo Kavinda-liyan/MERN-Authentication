@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useUpdateProfileMutation } from "../../../app/api/usersApiSlice";
 import FormContainer from "../../../components/FormContainer";
 import { toast } from "react-toastify";
+import Loading from "../../../components/Loading";
+import Error from "../../../components/Error";
 
 const UpdateProfile = () => {
   const [name, setName] = useState("");
@@ -15,7 +17,7 @@ const UpdateProfile = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [updateProfile, { isLoading }] = useUpdateProfileMutation();
+  const [updateProfile, { isLoading, error }] = useUpdateProfileMutation();
 
   useEffect(() => {
     setName(userInfo.name);
@@ -47,6 +49,15 @@ const UpdateProfile = () => {
 
   const inputTxtStyle =
     "bg-neutral-100 border-[1.5px] border-neutral-200 rounded-md p-1 text-neutral-500";
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <Error />;
+  }
+
   return (
     <FormContainer>
       <h1 className="text-left mb-4 text-2xl font-semibold">Update profile</h1>

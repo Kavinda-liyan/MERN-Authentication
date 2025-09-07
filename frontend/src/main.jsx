@@ -50,7 +50,7 @@ const router = createBrowserRouter(
           </AdminRoute>
         }
       />
-      <Route path="/error" element={<Error />} />
+      
     </Route>
   )
 );

@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRegisterMutation } from "../../app/api/usersApiSlice";
 import { setCredentials } from "../../app/features/auth/authSlice";
 import { toast } from "react-toastify";
+import Loading from "../../components/Loading";
+import Error from "../../components/Error";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -19,7 +21,7 @@ const Register = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [register, { isLoading }] = useRegisterMutation();
+  const [register, { isLoading, error }] = useRegisterMutation();
   const { userInfo } = useSelector((state) => state.auth);
 
   const { search } = useLocation();
@@ -52,6 +54,14 @@ const Register = () => {
       }
     }
   };
+
+  if(isLoading){
+    return <Loading/>
+  }
+
+  if(error){
+    return <Error/>
+  }
 
   return (
     <FormContainer>
