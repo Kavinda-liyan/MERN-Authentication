@@ -36,8 +36,11 @@ const ViewUsers = () => {
         await deleteUser(selectedUser._id);
         navigate("/users");
         toast.success(`You have successfully deleted ${selectedUser.name}.`);
+        setSelectedUser(false);
       } catch (error) {
         toast.error(error.data.message || error.error);
+      } finally {
+        selectedUser(null);
       }
     } else return;
   };
@@ -52,18 +55,19 @@ const ViewUsers = () => {
 
   return (
     <div className={`${PAGE_HEIGHT} relative`}>
-      {showModel && (
+      {selectedUser && (
         <Confirm
           message={"Are you sure you want to delete this user?"}
           varient={"warning"}
           fn={deleteHandler}
+          onClose={() => setSelectedUser(null)}
         />
       )}
 
       <div
         className={`${PAGE_PADDINGS} flex items-center justify-center h-full w-full`}
       >
-        <div className="max-[2160px]:w-[75%] max-xl:w-[90%] max-md:w-[100%]">
+        <div className="max-[2160px]:w-[75%] max-xl:w-[90%] max-md:w-[100%] overflow-x-scroll">
           <table className="table-auto w-full border-collapse border border-cyan-900/10">
             <thead className="bg-cyan-950 text-left text-white">
               <tr className="p-20">

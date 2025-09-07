@@ -6,7 +6,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 
-const Confirm = ({ varient, fn, message }) => {
+const Confirm = ({ varient, fn, message, onClose }) => {
   const [toggleModel, setToggleModel] = useState(false);
 
   const renderIcon = (varient) => {
@@ -19,7 +19,6 @@ const Confirm = ({ varient, fn, message }) => {
   };
   return (
     <div
-      
       className={`absolute h-full  w-full z-10 flex justify-center items-center bg-gray-500/50 ${
         toggleModel ? "hidden" : ""
       }`}
@@ -28,7 +27,7 @@ const Confirm = ({ varient, fn, message }) => {
         <div className="w-full float-end text-right h-[10%]">
           <button
             className="p-1 h-8 w-8 text-gray-500 hover:cursor-pointer hover:text-gray-700 duration-150"
-            onClick={() => setToggleModel((prev) => !prev)}
+            onClick={() => onClose()}
           >
             <FontAwesomeIcon icon={faTimes} />
           </button>
@@ -47,7 +46,7 @@ const Confirm = ({ varient, fn, message }) => {
             Confirm
           </button>
           <button
-            onClick={() => setToggleModel((prev) => !prev)}
+            onClick={() => onClose()}
             className="px-2 py-1  h-fit  bg-gray-600 hover:bg-gray-500 hover:cursor-pointer duration-150 text-white rounded-md shadow-md font-semibold text-md"
           >
             Cancel

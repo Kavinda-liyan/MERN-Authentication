@@ -148,6 +148,46 @@ const Header = () => {
     </>
   );
 
+  const navLinksMobile = userInfo ? (
+    <>
+      <ul
+        className="flex gap-5 flex-col w-full items-center justify-center "
+        ref={dropDownRef}
+      >
+        {userInfo.isAdmin ? (
+          <>
+            <List>
+              <Link to={"/profile"}>
+                <FontAwesomeIcon icon={faUserAlt} className="pr-1" />
+                Profile
+              </Link>
+            </List>
+
+            <List>
+              <FontAwesomeIcon icon={faUsers} className="pr-1" />
+              <Link to={"/users"}>All Users</Link>
+            </List>
+
+            <List>
+              <button onClick={handleLogout} className="hover:cursor-pointer">
+                <FontAwesomeIcon icon={faSignOutAlt} className="pr-1" />
+                Sign out
+              </button>
+            </List>
+          </>
+        ) : (
+          <>{authProfile}</>
+        )}
+      </ul>
+    </>
+  ) : (
+    <>
+      <ul className="absolute top-10 right-10 bg-cyan-900 p-2 rounded-md ">
+        {authLinks}
+      </ul>
+    </>
+  );
+
   return (
     <>
       <nav>
@@ -190,7 +230,7 @@ const Header = () => {
                   : "scale-y-0 opacity-0 pointer-events-none"
               } top-[0px] absolute w-full gap-10 flex flex-col bg-cyan-950 h-[100vh] z-[50] left-0 items-center justify-center transform transition-all duration-300 origin-top `}
             >
-              {navLinks}
+              {navLinksMobile}
             </div>
           </div>
         </div>
