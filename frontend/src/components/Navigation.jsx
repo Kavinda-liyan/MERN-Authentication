@@ -10,7 +10,7 @@ import {
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useLogoutMutation } from "../app/api/usersApiSlice";
@@ -18,7 +18,7 @@ import { logout } from "../app/features/auth/authSlice";
 import List from "./Components/List";
 import { PAGE_PADDINGS } from "../app/constants";
 
-const Header = () => {
+const Navigation = () => {
   const [toggleNavigation, setToggleNavigation] = useState(false);
   const [toggleDropdown, setToggleDropdown] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
@@ -45,17 +45,38 @@ const Header = () => {
     }
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropDownRef.current && !dropDownRef.current.contains(event.target)) {
+        setToggleDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLinkClick = () => {
+    setToggleNavigation(false);
+    setToggleDropdown(false);
+  };
+
   const authProfile = (
     <>
       <List>
-        <Link to={"/profile"}>
+        <Link to={"/profile"} onClick={handleLinkClick}>
           <FontAwesomeIcon icon={faUserAlt} className="pr-1" />
           Profile
         </Link>
       </List>
 
       <List>
-        <button onClick={handleLogout} className="hover:cursor-pointer">
+        <button
+          onClick={() => {
+            handleLogout();
+            handleLinkClick();
+          }}
+          className="hover:cursor-pointer"
+        >
           <FontAwesomeIcon icon={faSignOutAlt} className="pr-1" />
           Sign out
         </button>
@@ -66,13 +87,13 @@ const Header = () => {
   const authLinks = (
     <>
       <List>
-        <Link to={"/login"}>
+        <Link to={"/login"} onClick={handleLinkClick}>
           <FontAwesomeIcon icon={faSignInAlt} className="pr-1" />
           Sign in
         </Link>
       </List>
       <List>
-        <Link to={"/register"}>
+        <Link to={"/register"} onClick={handleLinkClick}>
           <FontAwesomeIcon icon={faSignIn} className="pr-1" />
           Sign up
         </Link>
@@ -104,18 +125,32 @@ const Header = () => {
             <>
               <List>
                 <Link to={"/profile"}>
-                  <FontAwesomeIcon icon={faUserAlt} className="pr-1" />
+                  <FontAwesomeIcon
+                    icon={faUserAlt}
+                    onClick={handleLinkClick}
+                    className="pr-1"
+                  />
                   Profile
                 </Link>
               </List>
 
               <List>
-                <FontAwesomeIcon icon={faUsers} className="pr-1" />
+                <FontAwesomeIcon
+                  icon={faUsers}
+                  onClick={handleLinkClick}
+                  className="pr-1"
+                />
                 <Link to={"/users"}>All Users</Link>
               </List>
 
               <List>
-                <button onClick={handleLogout} className="hover:cursor-pointer">
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    handleLinkClick();
+                  }}
+                  className="hover:cursor-pointer"
+                >
                   <FontAwesomeIcon icon={faSignOutAlt} className="pr-1" />
                   Sign out
                 </button>
@@ -157,7 +192,7 @@ const Header = () => {
         {userInfo.isAdmin ? (
           <>
             <List>
-              <Link to={"/profile"}>
+              <Link to={"/profile"} onClick={handleLinkClick}>
                 <FontAwesomeIcon icon={faUserAlt} className="pr-1" />
                 Profile
               </Link>
@@ -165,11 +200,19 @@ const Header = () => {
 
             <List>
               <FontAwesomeIcon icon={faUsers} className="pr-1" />
-              <Link to={"/users"}>All Users</Link>
+              <Link to={"/users"} onClick={handleLinkClick}>
+                All Users
+              </Link>
             </List>
 
             <List>
-              <button onClick={handleLogout} className="hover:cursor-pointer">
+              <button
+                onClick={() => {
+                  handleLogout();
+                  handleLinkClick();
+                }}
+                className="hover:cursor-pointer"
+              >
                 <FontAwesomeIcon icon={faSignOutAlt} className="pr-1" />
                 Sign out
               </button>
@@ -182,7 +225,7 @@ const Header = () => {
     </>
   ) : (
     <>
-      <ul className="absolute top-10 right-10 bg-cyan-900 p-2 rounded-md ">
+      <ul className="flex gap-5 flex-col w-full items-center justify-center ">
         {authLinks}
       </ul>
     </>
@@ -239,4 +282,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default Navigation;

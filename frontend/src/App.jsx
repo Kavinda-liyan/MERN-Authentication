@@ -1,14 +1,15 @@
 import { Outlet } from "react-router-dom";
-import Header from "./components/Header";
 import { ToastContainer } from "react-toastify";
-
+import Navigation from "./components/Navigation";
+import Footer from "./components/Footer";
 
 function App() {
   return (
     <>
-      <Header />
-      <ToastContainer/>
+      <Navigation />
+      <ToastContainer />
       <Outlet />
+      <Footer />
     </>
   );
 }

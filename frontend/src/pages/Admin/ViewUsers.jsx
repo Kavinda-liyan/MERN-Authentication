@@ -65,8 +65,12 @@ const ViewUsers = () => {
       )}
 
       <div
-        className={`${PAGE_PADDINGS} flex items-center justify-center h-full w-full`}
+        className={`${PAGE_PADDINGS} flex flex-col items-center justify-center h-full w-full`}
       >
+        <div>
+          <h3 className="m-2 text-2xl">All Users</h3>
+        </div>
+
         <div className="max-[2160px]:w-[75%] max-xl:w-[90%] max-md:w-[100%] overflow-x-scroll">
           <table className="table-auto w-full border-collapse border border-cyan-900/10">
             <thead className="bg-cyan-950 text-left text-white">
